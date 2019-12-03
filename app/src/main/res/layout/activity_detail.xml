@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:layoutDirection="rtl"
+    tools:context=".DetailActivity">
+
+    <View
+        android:id="@+id/guideline"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignBottom="@id/poster_img"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="50dp" />
+
+    <ImageView
+        android:id="@+id/poster_img"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:scaleType="centerCrop"
+        tools:src="@mipmap/ic_launcher" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/main_cv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/guideline"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        app:cardBackgroundColor="@color/surfaceColor"
+        app:cardCornerRadius="2dp"
+        app:cardElevation="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/title_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:fontFamily="@font/vazir"
+                android:textColor="@color/titleColor"
+                android:textSize="20sp"
+                tools:text="رستگاری در شانگهای" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/rate_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:fontFamily="@font/vazir_bold"
+                    android:includeFontPadding="true"
+                    android:textColor="@color/rateColor"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
+                    tools:text="9.1" />
+
+                <RatingBar
+                    android:id="@+id/rate_rb"
+                    style="?android:attr/ratingBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="10dp"
+                    android:backgroundTint="@color/rateColor"
+                    android:numStars="5"
+                    android:progressTint="@color/rateColor"
+                    android:rating="3.5"
+                    android:secondaryProgressTint="@color/rateColor" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/description_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:fontFamily="@font/vazir"
+                android:paddingBottom="20dp"
+                android:textColor="@color/textColor"
+                android:textSize="15sp"
+                tools:text="لورم ایپسوم یا طرح‌نما به متنی آزمایشی و بی‌معنی در صنعت چاپ، صفحه‌آرایی و طراحی گرافیک گفته می‌شود. طراح گرافیک از این متن به عنوان عنصری از ترکیب بندی برای پر کردن صفحه و ارایه اولیه شکل ظاهری و کلی طرح سفارش گرفته شده استفاده می نماید، تا از نظر گرافیکی نشانگر چگونگی نوع و اندازه فونت و ظاهر متن باشد.لورم ایپسوم یا طرح‌نما به متنی آزمایشی و بی‌معنی در صنعت چاپ، صفحه‌آرایی و طراحی گرافیک گفته می‌شود.لورم ایپسوم یا طرح‌نما به متنی آزمایشی و بی‌معنی در صنعت چاپ، صفحه‌آرایی و طراحی گرافیک گفته می‌شود. طراح گرافیک از این متن به عنوان عنصری از ترکیب، صفحه‌آرایی و طراحی گرافیک گفته می‌شود." />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/play_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@id/main_cv"
+        android:layout_alignBottom="@id/guideline"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="-28dp"
+        android:src="@drawable/ic_play" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:weightSum="2">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/bookmark_btn"
+            style="@style/Widget.MaterialComponents.Button.Icon"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/vazir_medium"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/detail_bookmark_button"
+            android:textColor="#FFF"
+            android:textSize="18sp"
+            app:backgroundTint="@color/surfaceColor"
+            app:cornerRadius="0dp"
+            app:icon="@drawable/ic_bookmark"
+            app:iconGravity="textStart" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/download_btn"
+            style="@style/Widget.MaterialComponents.Button.Icon"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:fontFamily="@font/vazir_medium"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/detail_download_button"
+            android:textColor="#FFF"
+            android:textSize="18sp"
+            app:cornerRadius="0dp"
+            app:icon="@drawable/ic_download"
+            app:iconGravity="textStart" />
+
+    </LinearLayout>
+
+</RelativeLayout>

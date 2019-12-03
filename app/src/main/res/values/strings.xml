@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Movies</string>
+    <string name="download_dialog_title">دانلود</string>
+    <string name="download_dialog_message">لطفا منتظر بمانید</string>
+    <string name="bookmark_dialog_title">علاقمندی‌ها</string>
+    <string name="bookmark_dialog_message">فیلم به علاقمندی‌ها اضافه شد.</string>
+    <string name="ok">خًب</string>
+    <string name="main_screen_title">۱۰ فیلم برتر IMDB</string>
+    <string name="detail_download_button">دانلود</string>
+    <string name="detail_bookmark_button">علاقمندی</string>
+    <string name="main_director_title">کارگردان: %1$s</string>
+    <string name="main_duration_title">زمان: %1$d دقیقه</string>
 </resources>

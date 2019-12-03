@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="ir.oveissi.moviesinappbilling">
 
+    <!-- for loading images -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -11,8 +14,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
-        <activity android:name="ir.oveissi.moviesinappbilling.MainActivity">
+        <activity
+            android:name=".PlayerActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".DetailActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

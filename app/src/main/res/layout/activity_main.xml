@@ -1,12 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF"
+    android:background="@color/colorPrimary"
     android:layoutDirection="rtl"
     tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/screen_title_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="25dp"
+        android:fontFamily="@font/vazir_bold"
+        android:text="@string/main_screen_title"
+        android:textColor="@color/titleColor"
+        android:textSize="20sp" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/movies_rv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/screen_title_tv"
+        android:layout_marginTop="25dp"
+        android:scrollbars="vertical" />
 
 
 </RelativeLayout>

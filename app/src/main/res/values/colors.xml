@@ -3,4 +3,10 @@
     <color name="colorPrimary">#17162e</color>
     <color name="colorPrimaryDark">#17162e</color>
     <color name="colorAccent">#282ddb</color>
+
+    <color name="surfaceColor">#1d1c3b</color>
+
+    <color name="titleColor">#fff</color>
+    <color name="textColor">#5d5c73</color>
+    <color name="rateColor">#e3c84e</color>
 </resources>
