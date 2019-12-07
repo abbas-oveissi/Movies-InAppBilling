@@ -10,4 +10,8 @@
     <string name="detail_bookmark_button">علاقمندی</string>
     <string name="main_director_title">کارگردان: %1$s</string>
     <string name="main_duration_title">زمان: %1$d دقیقه</string>
+    <string name="setting_up_inapp_error">راه‌اندازی خرید درون برنامه‌ای با مشکل مواجه شده است.</string>
+    <string name="cafebazaar_isnot_installed_error">برنامه‌ی کافه‌بازار را برای استفاده از خرید درون برنامه‌ای نصب کنید</string>
+    <string name="purchasing_error">در فرآیند خرید خطایی رخ داده است.</string>
+    <string name="query_inventory_error">در دریافت اطلاعات محصولات خرید درون برنامه‌ای خطایی رخ داده است.</string>
 </resources>

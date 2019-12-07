@@ -3,6 +3,7 @@ package ir.oveissi.moviesinappbilling;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -10,14 +11,23 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
+import ir.oveissi.moviesinappbilling.iabhelpers.IabHelper;
+import ir.oveissi.moviesinappbilling.iabhelpers.IabResult;
+import ir.oveissi.moviesinappbilling.iabhelpers.Inventory;
+import ir.oveissi.moviesinappbilling.iabhelpers.Purchase;
+
 public class DetailActivity extends AppCompatActivity {
+
+    private static final String SKU_STREAMING = "STREAMING";
 
     public static final String KEY_TITLE = "TITLE";
     public static final String KEY_DESCRIPTION = "DESCRIPTION";
@@ -36,6 +46,7 @@ public class DetailActivity extends AppCompatActivity {
     String poster;
     Float rate;
     String screenshot;
+    private IabHelper mHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +73,16 @@ public class DetailActivity extends AppCompatActivity {
         ratingRb.setRating(rate);
         Picasso.get().load(poster).into(posterImg);
 
+        String base64EncodedPublicKey = "MIHNMA0GCSqGSIb3DQEBAQUAA4G7ADCBtwKBrwD4iLpCmSQxHsuw+uT5smFvP2qj5zZHMUXptVcsDKQ5LCuy98s3Gx/u6fUfLo4tuWtF8Yr1xxJJ4IOa7wu7tV19DJ24FBH+fXdb/LU8ymBQLQEQImZ5ygc/66v38djRel7hdAqBx0zWsPHJJ62vedMC2jKTCBLtmwJUc2h7kJVJzF+8meI7puzZrdKodz285E1HXFsS0VDNFiGDNzBE/Y1wYPiBIv6IozdcHifgRdsCAwEAAQ==";
+        mHelper = new IabHelper(this, base64EncodedPublicKey);
+        mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+            public void onIabSetupFinished(IabResult result) {
+                if (!result.isSuccess()) {
+                    Toast.makeText(DetailActivity.this, R.string.setting_up_inapp_error, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         setupListeners();
 
     }
@@ -70,7 +91,7 @@ public class DetailActivity extends AppCompatActivity {
         playVideoFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openPlayer();
+                isUserBuyStreaming();
             }
         });
 
@@ -105,6 +126,41 @@ public class DetailActivity extends AppCompatActivity {
     }
 
 
+    private void isUserBuyStreaming() {
+        if (!isCafeInstalled()) {
+            Toast.makeText(this, R.string.cafebazaar_isnot_installed_error, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        mHelper.queryInventoryAsync(new IabHelper.QueryInventoryFinishedListener() {
+            public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+                if (result.isFailure()) {
+                    Toast.makeText(DetailActivity.this, R.string.query_inventory_error, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (inventory.hasPurchase(SKU_STREAMING)) {
+                    openPlayer();
+                } else {
+                    buyStreaming();
+                }
+            }
+        });
+    }
+
+    private void buyStreaming() {
+        mHelper.launchPurchaseFlow(this, SKU_STREAMING, 1, new IabHelper.OnIabPurchaseFinishedListener() {
+            @Override
+            public void onIabPurchaseFinished(IabResult result, Purchase info) {
+                if (result.isFailure()) {
+                    Toast.makeText(DetailActivity.this, R.string.purchasing_error, Toast.LENGTH_SHORT).show();
+                    return;
+                } else if (info.getSku().equals(SKU_STREAMING)) {
+                    openPlayer();
+                }
+            }
+        });
+    }
+
     private void bookmarkMovie() {
         final AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(getResources().getString(R.string.bookmark_dialog_title))
@@ -117,6 +173,22 @@ public class DetailActivity extends AppCompatActivity {
                 })
                 .create();
         dialog.show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mHelper.handleActivityResult(requestCode, resultCode, data);
+    }
+
+    private boolean isCafeInstalled() {
+        PackageManager pm = getPackageManager();
+        try {
+            pm.getPackageInfo("com.farsitel.bazaar", 0);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
+        }
     }
 
     private void openPlayer() {
