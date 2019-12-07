@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="ir.oveissi.moviesinappbilling">
 
+    <uses-permission android:name="com.farsitel.bazaar.permission.PAY_THROUGH_BAZAAR" />
     <!-- for loading images -->
     <uses-permission android:name="android.permission.INTERNET" />
 
