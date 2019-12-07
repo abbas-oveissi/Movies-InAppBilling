@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -28,7 +29,8 @@ import ir.oveissi.moviesinappbilling.iabhelpers.Purchase;
 public class DetailActivity extends AppCompatActivity {
 
     private static final String SKU_FULL_VERSION = "FULLVERSION";
-
+    private static final String SKU_DOWNLOAD = "DOWNLOAD";
+    private static final String TAG = DetailActivity.class.getSimpleName();
     public static final String KEY_TITLE = "TITLE";
     public static final String KEY_DESCRIPTION = "DESCRIPTION";
     public static final String KEY_POSTER = "POSTER";
@@ -47,6 +49,7 @@ public class DetailActivity extends AppCompatActivity {
     Float rate;
     String screenshot;
     private IabHelper mHelper;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +102,7 @@ public class DetailActivity extends AppCompatActivity {
         downloadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startDownloading();
+                buyDownload();
             }
         });
 
@@ -107,6 +110,38 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 isUserBuyFullVersion();
+            }
+        });
+    }
+
+    private void buyDownload() {
+        if (!isCafeInstalled()) {
+            Toast.makeText(this, R.string.cafebazaar_isnot_installed_error, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        mHelper.launchPurchaseFlow(this, SKU_DOWNLOAD, 1, new IabHelper.OnIabPurchaseFinishedListener() {
+            @Override
+            public void onIabPurchaseFinished(IabResult result, Purchase info) {
+                if (result.isFailure()) {
+                    Log.d(TAG, getResources().getString(R.string.purchasing_error) + result);
+                    return;
+                } else if (info.getSku().equals(SKU_DOWNLOAD)) {
+                    consumeDownloadPurchase(info);
+                }
+            }
+        });
+    }
+
+    private void consumeDownloadPurchase(Purchase purchase) {
+        mHelper.consumeAsync(purchase, new IabHelper.OnConsumeFinishedListener() {
+            @Override
+            public void onConsumeFinished(Purchase purchase, IabResult result) {
+                if (result.isFailure()) {
+                    Toast.makeText(DetailActivity.this, R.string.purchasing_error, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                startDownloading();
             }
         });
     }
