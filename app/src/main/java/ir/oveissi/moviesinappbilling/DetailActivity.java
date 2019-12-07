@@ -30,7 +30,9 @@ public class DetailActivity extends AppCompatActivity {
 
     private static final String SKU_FULL_VERSION = "FULLVERSION";
     private static final String SKU_DOWNLOAD = "DOWNLOAD";
+    private static final String SKU_STREAMING = "STREAMING";
     private static final String TAG = DetailActivity.class.getSimpleName();
+
     public static final String KEY_TITLE = "TITLE";
     public static final String KEY_DESCRIPTION = "DESCRIPTION";
     public static final String KEY_POSTER = "POSTER";
@@ -95,7 +97,7 @@ public class DetailActivity extends AppCompatActivity {
         playVideoFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                openPlayer();
+                isUserBuyStreaming();
             }
         });
 
@@ -161,6 +163,41 @@ public class DetailActivity extends AppCompatActivity {
         }, 3000);
     }
 
+
+    private void isUserBuyStreaming() {
+        if (!isCafeInstalled()) {
+            Toast.makeText(this, R.string.cafebazaar_isnot_installed_error, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        mHelper.queryInventoryAsync(new IabHelper.QueryInventoryFinishedListener() {
+            public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+                if (result.isFailure()) {
+                    Toast.makeText(DetailActivity.this, R.string.query_inventory_error, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (inventory.hasPurchase(SKU_STREAMING)) {
+                    openPlayer();
+                } else {
+                    buyStreaming();
+                }
+            }
+        });
+    }
+
+    private void buyStreaming() {
+        mHelper.launchPurchaseFlow(this, SKU_STREAMING, 1, new IabHelper.OnIabPurchaseFinishedListener() {
+            @Override
+            public void onIabPurchaseFinished(IabResult result, Purchase info) {
+                if (result.isFailure()) {
+                    Toast.makeText(DetailActivity.this, R.string.purchasing_error, Toast.LENGTH_SHORT).show();
+                    return;
+                } else if (info.getSku().equals(SKU_STREAMING)) {
+                    openPlayer();
+                }
+            }
+        });
+    }
 
     private void bookmarkMovie() {
         final AlertDialog dialog = new AlertDialog.Builder(this)
