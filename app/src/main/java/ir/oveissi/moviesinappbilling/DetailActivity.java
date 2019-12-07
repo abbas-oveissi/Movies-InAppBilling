@@ -1,11 +1,15 @@
 package ir.oveissi.moviesinappbilling;
 
 import android.app.ProgressDialog;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +22,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.farsitel.bazaar.ILoginCheckService;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
@@ -45,13 +50,17 @@ public class DetailActivity extends AppCompatActivity {
     RatingBar ratingRb;
     ImageView posterImg;
 
+    ILoginCheckService service;
+
+    LoginCheckServiceConnection connection;
+
     String title;
     String description;
     String poster;
     Float rate;
     String screenshot;
     private IabHelper mHelper;
-
+    private boolean isLoggedIn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +98,7 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
+        initService();
         setupListeners();
 
     }
@@ -163,71 +173,14 @@ public class DetailActivity extends AppCompatActivity {
         }, 3000);
     }
 
-
-    private void isUserBuyStreaming() {
+    private void isUserBuyFullVersion() {
         if (!isCafeInstalled()) {
             Toast.makeText(this, R.string.cafebazaar_isnot_installed_error, Toast.LENGTH_SHORT).show();
             return;
         }
 
-        mHelper.queryInventoryAsync(new IabHelper.QueryInventoryFinishedListener() {
-            public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
-                if (result.isFailure()) {
-                    Toast.makeText(DetailActivity.this, R.string.query_inventory_error, Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (inventory.hasPurchase(SKU_STREAMING)) {
-                    openPlayer();
-                } else {
-                    buyStreaming();
-                }
-            }
-        });
-    }
-
-    private void buyStreaming() {
-        mHelper.launchPurchaseFlow(this, SKU_STREAMING, 1, new IabHelper.OnIabPurchaseFinishedListener() {
-            @Override
-            public void onIabPurchaseFinished(IabResult result, Purchase info) {
-                if (result.isFailure()) {
-                    Toast.makeText(DetailActivity.this, R.string.purchasing_error, Toast.LENGTH_SHORT).show();
-                    return;
-                } else if (info.getSku().equals(SKU_STREAMING)) {
-                    openPlayer();
-                }
-            }
-        });
-    }
-
-    private void bookmarkMovie() {
-        final AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle(getResources().getString(R.string.bookmark_dialog_title))
-                .setMessage(getResources().getString(R.string.bookmark_dialog_message))
-                .setNeutralButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                })
-                .create();
-        dialog.show();
-    }
-
-    private void openPlayer() {
-        Intent intent = new Intent(DetailActivity.this, PlayerActivity.class);
-        intent.putExtra(PlayerActivity.KEY_SCREENSHOT, screenshot);
-        startActivity(intent);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        mHelper.handleActivityResult(requestCode, resultCode, data);
-    }
-
-    private void isUserBuyFullVersion() {
-        if (!isCafeInstalled()) {
-            Toast.makeText(this, R.string.cafebazaar_isnot_installed_error, Toast.LENGTH_SHORT).show();
+        if (!isUserLoggedInCafe()) {
+            Toast.makeText(this, R.string.cafebazaar_user_isnt_logged_in, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -260,6 +213,70 @@ public class DetailActivity extends AppCompatActivity {
         });
     }
 
+    private void bookmarkMovie() {
+        final AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(getResources().getString(R.string.bookmark_dialog_title))
+                .setMessage(getResources().getString(R.string.bookmark_dialog_message))
+                .setNeutralButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .create();
+        dialog.show();
+    }
+
+    private void isUserBuyStreaming() {
+        if (!isCafeInstalled()) {
+            Toast.makeText(this, R.string.cafebazaar_isnot_installed_error, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!isUserLoggedInCafe()) {
+            Toast.makeText(this, R.string.cafebazaar_user_isnt_logged_in, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        mHelper.queryInventoryAsync(new IabHelper.QueryInventoryFinishedListener() {
+            public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+                if (result.isFailure()) {
+                    Toast.makeText(DetailActivity.this, R.string.query_inventory_error, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (inventory.hasPurchase(SKU_STREAMING)) {
+                    openPlayer();
+                } else {
+                    buyStreaming();
+                }
+            }
+        });
+    }
+
+    private void openPlayer() {
+        Intent intent = new Intent(DetailActivity.this, PlayerActivity.class);
+        intent.putExtra(PlayerActivity.KEY_SCREENSHOT, screenshot);
+        startActivity(intent);
+    }
+
+    private void buyStreaming() {
+        mHelper.launchPurchaseFlow(this, SKU_STREAMING, 1, new IabHelper.OnIabPurchaseFinishedListener() {
+            @Override
+            public void onIabPurchaseFinished(IabResult result, Purchase info) {
+                if (result.isFailure()) {
+                    Toast.makeText(DetailActivity.this, R.string.purchasing_error, Toast.LENGTH_SHORT).show();
+                    return;
+                } else if (info.getSku().equals(SKU_STREAMING)) {
+                    openPlayer();
+                }
+            }
+        });
+    }
+
+    private boolean isUserLoggedInCafe() {
+        return isLoggedIn;
+    }
+
     private boolean isCafeInstalled() {
         PackageManager pm = getPackageManager();
         try {
@@ -270,4 +287,55 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mHelper != null) mHelper.dispose();
+        mHelper = null;
+        releaseService();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mHelper.handleActivityResult(requestCode, resultCode, data);
+    }
+
+    private void initService() {
+        Log.i(TAG, "initService()");
+        connection = new LoginCheckServiceConnection();
+        Intent i = new Intent(
+                "com.farsitel.bazaar.service.LoginCheckService.BIND");
+        i.setPackage("com.farsitel.bazaar");
+        boolean ret = bindService(i, connection, Context.BIND_AUTO_CREATE);
+        Log.e(TAG, "initService() bound value: " + ret);
+    }
+
+    /** This is our function to un-binds this activity from our service. */
+    private void releaseService() {
+        unbindService(connection);
+        connection = null;
+        Log.d(TAG, "releaseService(): unbound.");
+    }
+
+    public class LoginCheckServiceConnection implements ServiceConnection {
+
+        private static final String TAG = "LoginCheck";
+
+        public void onServiceConnected(ComponentName name, IBinder boundService) {
+            service = ILoginCheckService.Stub
+                    .asInterface((IBinder) boundService);
+            try {
+                isLoggedIn = service.isLoggedIn();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Log.e(TAG, "onServiceConnected(): Connected");
+        }
+
+        public void onServiceDisconnected(ComponentName name) {
+            service = null;
+            Log.e(TAG, "onServiceDisconnected(): Disconnected");
+        }
+    }
 }

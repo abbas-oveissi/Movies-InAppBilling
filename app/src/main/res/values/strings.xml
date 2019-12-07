@@ -14,4 +14,5 @@
     <string name="cafebazaar_isnot_installed_error">برنامه‌ی کافه‌بازار را برای استفاده از خرید درون برنامه‌ای نصب کنید</string>
     <string name="purchasing_error">در فرآیند خرید خطایی رخ داده است.</string>
     <string name="query_inventory_error">در دریافت اطلاعات محصولات خرید درون برنامه‌ای خطایی رخ داده است.</string>
+    <string name="cafebazaar_user_isnt_logged_in">برای استفاده از پرداخت درون برنامه‌ای وارد حسابتان در برنامه کافه بازار شوید.</string>
 </resources>
